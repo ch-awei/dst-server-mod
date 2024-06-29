@@ -7,7 +7,7 @@ description = [[
 
   最好别开带[测]选项，崩档我可不管！
 
-  2024.06.23 更新日志：
+  2024.06.29 更新日志：
     新增自动堆叠是否全部堆叠选项
     已删：狗牙吹箭无限容量
     将删：武器增强
@@ -17,7 +17,7 @@ description = [[
 
 ]]
 
-version = '2024.06.23'
+version = '2024.06.29'
 api_version = 0xa
 priority = -999999
 
@@ -43,7 +43,7 @@ end
 configuration_options = {
   AddConfig('原版修改'),
   AddConfig('自动堆叠', 'auto_stack', nil, {
-    SetOption(nil, nil,'什么都不发生'),
+    SetOption(nil, nil, '什么都不发生'),
     SetOption('小范围', 4, '半径1格地皮'),
     SetOption('中范围', 16, '半径4格地皮'),
     SetOption('大范围', 32, '半径8格地皮')
@@ -63,7 +63,7 @@ configuration_options = {
   AddConfig('牛铃铛', 'beef_bell', '牛铃铛可以像岩浆虫牙一样包起来'),
   AddConfig('眼塔可拆', 'eye_turret', '可右键眼球塔回收\n被摧毁时返还一个眼球塔'),
   AddConfig('海星CD', 'trap_starfish_cd', nil, {
-    SetOption(nil, nil,'什么都不发生'),
+    SetOption(nil, nil, '什么都不发生'),
     SetOption('较快', 30, '30s'),
     SetOption('很快', 15, '15s'),
     SetOption('灰常快', 5, '5s，这个别轻易尝试')
@@ -81,14 +81,14 @@ configuration_options = {
   AddConfig('[删]武器增强', 'better_sword', '下个本版删除'),
   AddConfig('高级耕作帽', 'hat_nutrientsgoggles', '高级耕作帽可以放种子[农作物种子、树木种子、大理石豆]进行播种'),
   AddConfig('龙蝇箱收集', 'dragonfly_chest_collect', '龙蝇箱子第一格有懒人护符则在关箱子或加载世界时收集后面紧接的第一格物品\n护符耐久不足且箱子内有噩梦燃料则会自动为护符添燃', {
-    SetOption(nil, nil,'什么都不发生'),
+    SetOption(nil, nil, '什么都不发生'),
     SetOption('小范围', 12, '半径2格地皮'),
     SetOption('大范围', 40, '半径10格地皮，人物的加载范围(常说的一个屏幕)'),
     SetOption('全图', 3000)
   }),
   AddConfig('更多能力', 'versatile', '为玩家添加更多能力\n若启用《能力勋章》则失效'),
   AddConfig('更多配方', 'more_recipes', '添加约束静电[精炼]、空瓶子[精炼/人物(仅薇洛)]等配方', {
-    SetOption(nil, nil,'什么都不发生'),
+    SetOption(nil, nil, '什么都不发生'),
     SetOption('一般', 2),
     SetOption('简单', 1, '材料减半')
   }),

@@ -89,8 +89,6 @@ function SetNumberFormat(num, n)
   return int + tonumber(string.format('%.' .. n .. 'f', f))
 end
 
-if not IsClient then return end
-
 function ResetBasicName(inst, fn_rename)
   local _name = type(inst.GetBasicDisplayName) == 'function' and inst:GetBasicDisplayName() or nil
   if type(fn_rename) ~= 'function' or type(_name) ~= 'string' or string.find(_name, 'MISSING NAME') then
