@@ -1,3 +1,5 @@
+GLOBAL.setmetatable(env, {__index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end})
+
 local function OnUpgrade(inst, performer, upgraded_from_item)
   local numupgrades = inst.components.upgradeable.numupgrades
   if numupgrades == 1 then
@@ -19,10 +21,23 @@ local function OnUpgrade(inst, performer, upgraded_from_item)
   end
 end
 
+TUNING.IGNORE_upgradeable_prefab = {
+  'dragonflychest',
+  'treasurechest',
+  'bearger_chest', -- 勋章 熊皮箱
+}
+local checkContainer = function(inst)
+  return inst and inst.components.container ~= nil
+    and inst.components.container.acceptsstacks
+    and not table.contains(TUNING.IGNORE_upgradeable_prefab, inst.prefab)
+    and not inst:HasTag('_has_upgradeable')
+end
+--[[
 AddComponentPostInit('container', function(self, inst)
   if inst.components.upgradeable ~= nil
     or inst:HasOneOfTags({'chest_upgradeable', '_health'})
     or not self.acceptsstacks
+    or table.contains(TUNING.IGNORE_upgradeable_prefab, inst.prefab)
   then
     return
   end
@@ -39,13 +54,35 @@ AddComponentPostInit('container', function(self, inst)
     return _onload(_, ...)
   end
 end)
-
-if IsServer then return end
+--]]
 
 AddPrefabPostInitAny(function(inst)
   if inst:HasOneOfTags({'INLIMBO', 'FX', 'NOCLICK', '_health'}) then
     return
   end
+  -- if not inst:HasTag('_container') then return end
+  if inst.components.upgradeable ~= nil then
+    inst:AddTag('_has_upgradeable')
+    return
+  end
+
+  if checkContainer(inst) then
+    local upgradeable = inst:AddComponent('upgradeable')
+    upgradeable.upgradetype = UPGRADETYPES.CHEST
+    upgradeable:SetOnUpgradeFn(OnUpgrade)
+  end
+
+  local _onload = inst.OnLoad or function() end
+  inst.OnLoad = function(_, ...)
+    if not checkContainer(_) then
+      return _onload(_, ...)
+    end
+    if _.components.upgradeable ~= nil and _.components.upgradeable.numupgrades > 0 then
+      OnUpgrade(_)
+    end
+    return _onload(_, ...)
+  end
+
   inst:DoTaskInTime(0, function(inst)
     if not inst:HasTag('_container') then return end
     ResetBasicName(inst, function(str)

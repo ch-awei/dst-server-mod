@@ -1,5 +1,3 @@
-if IsClient then return end
-
 local cfg = GetModConfigData('auto_stack')
 local range = type(cfg) == 'number' and cfg or 5
 local all_autostack = GetModConfigData('all_autostack')
@@ -20,8 +18,13 @@ AddComponentPostInit('stackable', function(self, inst)
       local x, y, z = inst.Transform:GetWorldPosition()
       local ents = TheSim:FindEntities(x, 0, z, range, {'_stackable'}, tags_ignore)
       for _, item in ipairs(ents) do
-        if item:IsValid() and item.components.stackable and not item.components.stackable:IsFull() and
-          item.prefab == inst.prefab and item ~= inst and item.skinname == inst.skinname then
+        if item:IsValid()
+          and item.components.stackable
+          and not item.components.stackable:IsFull()
+          and item.prefab == inst.prefab
+          and item ~= inst
+          and item.skinname == inst.skinname
+        then
           if #ents < 20 then
             SpawnPrefab('sand_puff').Transform:SetPosition(item.Transform:GetWorldPosition())
           end

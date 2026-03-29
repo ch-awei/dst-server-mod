@@ -1,9 +1,7 @@
-if IsClient then return end
-
 local range = GetModConfigData('dragonfly_chest_collect')
 
 local prefab_ignore = {'gift', 'bundle', 'myth_bundle'}
-local tags_ignore = {'NOCLICK', 'INLIMBO', 'FX', 'heavy', 'smallcreature', 'lootpump_oncatch', 'lootpump_onflight'}
+local tags_ignore = {'NOCLICK', 'INLIMBO', 'FX', 'heavy', 'lootpump_oncatch', 'lootpump_onflight'}
 
 local function fn(inst)
   local container = inst.components.container

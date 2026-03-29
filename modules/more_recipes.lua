@@ -21,3 +21,14 @@ AddRecipe2(
   { builder_tag = 'heatresistant' },
   { 'REFINE', 'CHARACTER' }
 )
+
+AddRecipe2(
+  'wagdrone_parts',
+  {
+    Ingredient('wagpunkbits_kit', 1 * multiple),
+    Ingredient('gestalt_cage_filled2', 1),
+  },
+  TECH.SCIENCE_TWO,
+  { no_deconstruction = true },
+  { 'REFINE' }
+)

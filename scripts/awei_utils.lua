@@ -1,7 +1,7 @@
 GLOBAL.setmetatable(env, {__index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end})
 
-IsServer = TheNet and TheNet:GetIsServer()
-IsClient = TheNet and not TheNet:IsDedicated()
+local IsServer = TheNet and TheNet:GetIsServer()
+local IsClient = TheNet and not TheNet:IsDedicated()
 
 function KillTask(task)
   if task == nil then return end
@@ -9,7 +9,7 @@ function KillTask(task)
   task = nil
 end
 
-function EndableOneOfMods(ids)
+function IsEndableMods(ids)
   if type(ids) ~= 'table' then
     return KnownModIndex:IsModEnabled('workshop-' .. ids)
   end
@@ -20,35 +20,6 @@ function EndableOneOfMods(ids)
   end
   return false
 end
-
-function SpiceCaneat(spices)
-  for spice, data in pairs(spices) do
-    AddPrefabPostInit(spice, function(inst)
-      if not TheWorld.ismastersim or inst.components.edible ~= nil then return end
-      local edible = inst:AddComponent("edible")
-      edible.foodtype = FOODTYPE.GOODIES
-      edible.healthvalue = data.healthvalue or TUNING.HEALING_TINY
-      edible.sanityvalue = data.sanityvalue or TUNING.SANITY_SUPERTINY
-      if type(data.oneatenfn) == 'function' then
-        local _oneatenfn = edible.oneaten or function()end
-        inst.components.edible.oneaten = function(inst, eater)
-          _oneatenfn(inst, eater)
-          data.oneatenfn(inst, eater)
-        end
-      end
-    end)
-  end
-end
-
-AddPlayerPostInit(function(inst)
-  if not TheWorld.ismastersim then return end
-  inst:AddTag('compassbearer')
-  inst:AddTag('maprevealer')
-  inst:AddComponent('maprevealer')
-  if inst.components.maprevealable ~= nil then
-    inst.components.maprevealable:AddRevealSource(inst, 'compassbearer')
-  end
-end)
 
 GLOBAL['awei_deploy'] = function(param)
   if not ThePlayer then return end
@@ -82,7 +53,7 @@ GLOBAL['awei_place'] = function(param)
   end
 end
 
-function SetNumberFormat(num, n)
+function FormatNumber(num, n)
   local int, f = math.modf(num)
   if not n then return math.ceil(num) end
   if n < 2 and f < 0.1 then return int end
