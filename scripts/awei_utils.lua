@@ -3,6 +3,104 @@ GLOBAL.setmetatable(env, {__index = function(t, k) return GLOBAL.rawget(GLOBAL, 
 local IsServer = TheNet and TheNet:GetIsServer()
 local IsClient = TheNet and not TheNet:IsDedicated()
 
+function IsEmpty(target)
+  return target == nil or target == ""
+end
+
+function NotEmpty(target)
+  return not IsEmpty(target)
+end
+
+-- [[
+function SafeGet(target, path, default)
+  local success, result = pcall(function()
+    for i, key in pairs(string.split(path, '.')) do
+      target = target[key]
+    end
+    return target ~= nil and target or default
+  end)
+  return success and result or default
+end
+
+function HasValues(map, keys)
+  local success, result = pcall(function()
+    for _, key in pairs(keys) do
+      if IsEmpty(map[key]) then
+        return false
+      end
+    end
+    return true
+  end)
+  return success and result or false
+end
+
+function HasOneValue(map, keys)
+  local success, result = pcall(function()
+    for _, key in pairs(keys) do
+      if NotEmpty(map[key]) then
+        return true
+      end
+    end
+    return false
+  end)
+  return success and result or false
+end -- ]]
+
+--[[
+function HasValues(map, keys)
+  if type(map) ~= 'table'
+    or #map == 0
+    or type(keys) ~= 'table'
+    or #keys == 0
+  then
+    return false
+  end
+  for _, key in pairs(keys) do
+    if IsEmpty(map[key]) then
+      return false
+    end
+  end
+  return true
+end
+
+function HasOneValue(map, keys)
+  if type(map) ~= 'table'
+    or #map == 0
+    or type(keys) ~= 'table'
+    or #keys == 0
+  then
+    return false
+  end
+  for _, key in pairs(keys) do
+    if NotEmpty(map[key]) then
+      return true
+    end
+  end
+  return false
+end
+
+function SafeGet(target, path, default)
+  if IsEmpty(target) or type(path) ~= 'string' then
+    return default
+  end
+  local keys = string.split(path, '.')
+  for i, key in pairs(keys)  do
+    -- print(key, "==>", type(target) == "table" and target[key] or target)
+    if i < #keys and type(target) ~= "table" then
+      return default
+    end
+    if i == #keys and type(target) ~= "table" then
+      return target ~= nil and target or default
+    end
+    target = target[key]
+  end
+  return target ~= nil and target or default
+end -- ]]
+
+function HasOneOfComponents(inst, cs)
+  return HasOneValue(inst.components or {}, cs)
+end
+
 function KillTask(task)
   if task == nil then return end
   task:Cancel()
