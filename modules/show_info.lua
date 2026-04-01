@@ -1,17 +1,7 @@
 GLOBAL.setmetatable(env, {__index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end})
 
-local SetNet = function(inst, key, value)
-  if inst.NET_MAP[key] ~= nil then
-    inst.NET_MAP[key]:set(value)
-  end
-end
-
-local GetNet = function(inst, key)
-  if inst.NET_MAP[key] ~= nil then
-    return inst.NET_MAP[key]:value() or nil
-  end
-  return nil
-end
+local NetMap = require("util/net_map")
+local KEY_NET = modname .. "_net-show-info"
 
 local RegisterEventListeners = function(inst)
   local cs = inst and inst.components or nil
@@ -20,25 +10,25 @@ local RegisterEventListeners = function(inst)
     return inst
   end
 
-  if cs.health then
+  if cs.combat and cs.health then
     local fn_health = function(target)
-      SetNet(target, "health", FormatNumber(SafeGet(target, "components.health.currenthealth", 0), 1))
+      inst[KEY_NET]:Set("health", FormatNumber(SafeGet(target, "components.health.currenthealth", 0), 1))
     end
     fn_health(inst)
     inst:ListenForEvent("healthdelta", fn_health)
-  end
-  
-  if cs.combat then
-    SetNet(inst, "damage", FormatNumber(SafeGet(cs.combat, "defaultdamage", 0), 2))
-    local percent = FormatNumber(SafeGet(cs.combat, "playerdamagepercent", 0), 2)
-    if percent > 0 then
-      SetNet(inst, "damage_more", FormatNumber(percent * 100, 2) .. "%")
+    local damage = FormatNumber(SafeGet(cs.combat, "defaultdamage", 0), 2)
+    if damage > 0 then
+      local percent = FormatNumber(SafeGet(cs.combat, "playerdamagepercent", 0), 2)
+      if percent > 0 then
+        damage = damage .. " (" .. FormatNumber(percent * 100, 2) .. "%)"
+      end
+      inst[KEY_NET]:Set("damage", tostring(damage))
     end
   end
   
-  if cs.temperature then
+  if cs.heater and cs.temperature then
     local fn_temperature = function(target)
-      SetNet(target, "temperature", FormatNumber(SafeGet(target, "components.temperature.current", TUNING.STARTING_TEMP), 2))
+      inst[KEY_NET]:Set("temperature", FormatNumber(SafeGet(target, "components.temperature.current", TUNING.STARTING_TEMP), 2))
     end
     fn_temperature(inst)
     inst:ListenForEvent("temperaturedelta", fn_temperature)
@@ -82,7 +72,7 @@ local RegisterEventListeners = function(inst)
     end
     
     if #content_info > 0 then
-      SetNet(inst, "bundle", table.concat(content_info, "\n"))
+      inst[KEY_NET]:Set("bundle_content", table.concat(content_info, "\n"))
     end
   end
 end
@@ -91,33 +81,28 @@ local GenerateDisplayText = function(inst, base_name)
   local name = base_name
   
   if inst:HasTag("_health") and not inst:HasTag("smallcreature") then
-    local health = GetNet(inst, "health")
+    local health = inst[KEY_NET]:Get("health")
     if NotEmpty(health) and health > 0 then
       name = name .. "\n󰀍" .. FormatNumber(health, 1)
     end
   end
   
   if inst:HasTag("_combat") then
-    local damage = GetNet(inst, "damage")
-    if NotEmpty(damage) and damage > 0 then
-      name = name .. "\n󰀘" .. FormatNumber(damage, 1)
-      
-      local damage_more = GetNet(inst, "damage_more")
-      if NotEmpty(damage_more) then
-        name = name .. " (" .. damage_more .. ")"
-      end
+    local damage = inst[KEY_NET]:Get("damage")
+    if NotEmpty(damage) then
+      name = name .. "\n󰀘" .. damage
     end
   end
   
   if inst:HasTag("heatrock") then
-    local temperature = GetNet(inst, "temperature")
+    local temperature = inst[KEY_NET]:Get("temperature")
     if NotEmpty(temperature) then
       name = name .. "\n󰀈" .. FormatNumber(temperature, 1)
     end
   end
   
   if inst:HasTag("unwrappable") then
-    local bundle_content = GetNet(inst, "bundle")
+    local bundle_content = inst[KEY_NET]:Get("bundle_content")
     if NotEmpty(bundle_content) then
       name = name .. "\n" .. bundle_content
     end
@@ -126,26 +111,19 @@ local GenerateDisplayText = function(inst, base_name)
   return name
 end
 
-local NotInit = function(inst)
-  return IsEndableMods({"666155465", "2189004162"})
+AddPrefabPostInitAny(function(inst)
+  if IsEndableMods({"666155465", "2189004162"})
     or inst:HasOneOfTags({"NOCLICK", "FX"})
     or not inst:IsValid()
-    -- or not (
-    --   HasOneOfComponents(inst, {"health", "combat", "temperature", "unwrappable"})
-    --   or inst:HasOneOfTags({"_health", "_combat", "heatrock", "unwrappable"})
-    -- )
-end
+  then return inst end
 
-AddPrefabPostInitAny(function(inst)
-  if NotInit(inst) then return inst end
-
-  inst.NET_MAP = {
-    health = net_float(inst.GUID, "NET_CHANGE_health"),
-    damage = net_float(inst.GUID, "NET_CHANGE_damage"),
-    damage_more = net_string(inst.GUID, "NET_CHANGE_damage_more"),
-    temperature = net_float(inst.GUID, "NET_CHANGE_temperature"),
-    bundle = net_string(inst.GUID, "NET_CHANGE_bundle")
-  }
+  inst[KEY_NET] = NetMap(inst, modname .. "_show-info_net-change-")
+  inst[KEY_NET]:AddByMap({
+    health = net_float,
+    damage = net_string,
+    temperature = net_float,
+    bundle_content = net_string,
+  })
 
   inst:DoTaskInTime(0, RegisterEventListeners)
 
