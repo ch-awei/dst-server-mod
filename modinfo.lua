@@ -1,12 +1,15 @@
 name = "ServerMod"
 author = "awei"
 
-version = "2025.04.26"
+version = "2026.04.02"
 description = [[
-  别开带[测]选项！
+  选项说明:
+    [测] 测试中, 不建议开启, 如遇崩溃请关闭该选项
+    [删] 即将删除, 请做好清理
 
-  最近更新：删除了许多不想维护的功能
-
+  无间隔命令: (游戏内控制台远程模式下输入即可生效)
+    deploy_anywhere() -- 无间隔放置
+    place_anywhere() -- 无间隔建造
 ]]
 
 api_version = 0xa
@@ -53,7 +56,7 @@ configuration_options = {
   }),
   AddConfig("公共溯源表", "pocket_watch", "其他人可消耗少量饥饿和san使用溯源表"),
   AddConfig("弹性容器", "container_upgradeable", "所有容器均可以升级999+，包括模组的容器"),
-  AddConfig("Finder", "finder", "鼠标拿东西时含有同类物品的箱子高亮，找东西用的\n服务器启用《ShowMe》或《insight》时失效"),
+  AddConfig("[测]Finder", "finder", "鼠标拿东西时含有同类物品的箱子高亮，找东西用的\n服务器启用《ShowMe》或《insight》时失效"),
   AddConfig("[测]信息显示", "show_info", "显示物品部分信息\n服务器启用《ShowMe》或《insight》时失效"),
   AddConfig(
     "[删]龙蝇箱收集",
@@ -66,7 +69,7 @@ configuration_options = {
       SetOption("全图", 3000)
     }
   ),
-  AddConfig("高级耕作帽", "hat_nutrientsgoggles", "高级耕作帽可以放种子[农作物种子、树木种子、大理石豆]进行播种"),
+  AddConfig("[删]高级耕作帽", "hat_nutrientsgoggles", "高级耕作帽可以放种子[农作物种子、树木种子、大理石豆]进行播种"),
   AddConfig("更多配方", "more_recipes", "添加约束静电[精炼]、陀螺传导核心[精炼]、空瓶子[精炼/人物(仅薇洛)]等配方", {
     SetOption(nil, nil, "什么都不发生"),
     SetOption("一般", 2),
