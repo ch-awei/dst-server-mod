@@ -106,15 +106,16 @@ GLOBAL["deploy_anywhere"] = function(param)
 end
 GLOBAL["place_anywhere"] = function(param)
   param = param or 0
-  for _, v in pairs(AllRecipes) do
+  for k, v in pairs(AllRecipes) do
+    if v.build_distance and v.build_distance ~= param then
+      AllRecipes[k].build_distance = param
+    end
     if v.min_spacing and v.min_spacing ~= param then
-      v.min_spacing = param
+      AllRecipes[k].min_spacing = param
     end
   end
   if IS_SERVER and TheNet:GetUserID() ~= nil then
     SendModRPCToClient(CLIENT_MOD_RPC[SPACE_NAME].DEPLOY_ANYWHERE, TheNet:GetUserID(), param)
   end
 end
-if not IS_SERVER then
-  AddClientModRPCHandler(SPACE_NAME, "DEPLOY_ANYWHERE", place_anywhere)
-end
+AddClientModRPCHandler(SPACE_NAME, "DEPLOY_ANYWHERE", place_anywhere)
