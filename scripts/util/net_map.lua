@@ -1,13 +1,12 @@
-local KEY_NET = GLOBAL.modname .. "_net-map"
-
-local NetMap = Class(function(self, inst)
+local NetMap = Class(function(self, inst, key)
   self.inst = inst
+  self.key = key or "awei-server-mod_net-map"
   self.map = {}
 end)
 
 function NetMap:Add(key, netvar)
   netvar = netvar or net_string
-  self.map[key] = netvar(self.inst.GUID, KEY_NET .. ".change-" .. key)
+  self.map[key] = netvar(self.inst.GUID, self.key .. ".change-" .. key)
 end
 
 function NetMap:AddByMap(map)
@@ -34,7 +33,7 @@ function NetMap:Get(key)
 end
 
 function NetMap:ListenForEvent(key, callback)
-  self.inst:ListenForEvent(KEY_NET .. ".change-" .. key, callback)
+  self.inst:ListenForEvent(self.key .. ".change-" .. key, callback)
 end
 
-return NetMap, KEY_NET
+return NetMap

@@ -1,6 +1,7 @@
 GLOBAL.setmetatable(env, {__index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end})
 
-local NetMap, KEY_NET = require("util/net_map")
+local NetMap = require("util/net_map")
+local KEY_NET = NetMap.key or KEY_NET_MAP
 
 local RegisterEventListeners = function(inst)
   local cs = inst and inst.components or nil
@@ -38,7 +39,7 @@ local RegisterEventListeners = function(inst)
     local bundle_items = cs.unwrappable.itemdata
     
     if type(bundle_items) == "table" and #bundle_items > 0 then
-      for key, item in pairs(bundle_items) do
+      for key, item in ipairs(bundle_items) do
         local item_name = STRINGS.NAMES[string.upper(item.prefab)] or item.prefab
         local data = item.data or item
         local stack_size = SafeGet(data, "stackable.stack", 1)
@@ -117,7 +118,7 @@ AddPrefabPostInitAny(function(inst)
   then return inst end
 
   if not inst[KEY_NET] then
-    inst[KEY_NET] = NetMap(inst)
+    inst[KEY_NET] = NetMap(inst, KEY_NET)
   end
   inst[KEY_NET]:AddByMap({
     health = net_float,

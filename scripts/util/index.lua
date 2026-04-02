@@ -1,7 +1,8 @@
 GLOBAL.setmetatable(env, {__index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end})
 
-local IsServer = TheNet and TheNet:GetIsServer()
-local SpaceName = modname
+IS_SERVER = TheNet and TheNet:GetIsServer()
+SPACE_NAME = modname or "awei-server-mod"
+KEY_NET_MAP = SPACE_NAME .. "_net-map"
 
 function IsEmpty(target)
   return target == nil or target == ""
@@ -13,7 +14,7 @@ end
 
 function SafeGet(target, path, default)
   local success, result = pcall(function()
-    for i, key in pairs(string.split(path, ".")) do
+    for i, key in ipairs(string.split(path, ".")) do
       target = target[key]
     end
     return target ~= nil and target or default
@@ -33,7 +34,7 @@ end
 
 function MapHasAllValue(map, keys)
   local success, result = pcall(function()
-    for _, key in pairs(keys) do
+    for i, key in ipairs(keys) do
       if IsEmpty(map[key]) then
         return false
       end
@@ -45,7 +46,7 @@ end
 
 function MapHasOneValue(map, keys)
   local success, result = pcall(function()
-    for _, key in pairs(keys) do
+    for i, key in ipairs(keys) do
       if NotEmpty(map[key]) then
         return true
       end
@@ -71,7 +72,7 @@ function IsEndableMods(ids)
     if type(ids) ~= "table" then
       return KnownModIndex:IsModEnabled("workshop-" .. ids)
     end
-    for _, id in pairs(ids) do
+    for i, id in ipairs(ids) do
       if KnownModIndex:IsModEnabled("workshop-" .. id) then
         return true
       end
@@ -94,7 +95,7 @@ end
 GLOBAL["deploy_anywhere"] = function(param)
   if not ThePlayer then return end
   local x, y, z = ThePlayer.Transform:GetWorldPosition()
-  for _, v in pairs(TheSim:FindEntities(x, y, z, 2, {"deployable"}, {"FX", "NOCLICK", "player"})) do
+  for i, v in ipairs(TheSim:FindEntities(x, y, z, 2, {"deployable"}, {"FX", "NOCLICK", "player"})) do
     if v.Physics and (param or not v.components.health) then
       v.Physics:SetActive(false)
     end
@@ -110,10 +111,10 @@ GLOBAL["place_anywhere"] = function(param)
       v.min_spacing = param
     end
   end
-  if IsServer and TheNet:GetUserID() ~= nil then
-    SendModRPCToClient(CLIENT_MOD_RPC[SpaceName]DEPLOY_ANYWHERE, TheNet:GetUserID(), param)
+  if IS_SERVER and TheNet:GetUserID() ~= nil then
+    SendModRPCToClient(CLIENT_MOD_RPC[SPACE_NAME].DEPLOY_ANYWHERE, TheNet:GetUserID(), param)
   end
 end
-if not IsServer then
-  AddClientModRPCHandler(SpaceName, "DEPLOY_ANYWHERE", place_anywhere)
+if not IS_SERVER then
+  AddClientModRPCHandler(SPACE_NAME, "DEPLOY_ANYWHERE", place_anywhere)
 end

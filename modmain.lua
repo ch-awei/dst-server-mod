@@ -1,4 +1,4 @@
-require "util/index.lua"
+modimport("scripts/util/index.lua")
 
 local list_configuration = {
   "auto_stack",
