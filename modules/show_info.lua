@@ -1,7 +1,6 @@
 GLOBAL.setmetatable(env, {__index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end})
 
-local NetMap = require("util/net_map")
-local KEY_NET = modname .. "_net-show-info"
+local NetMap, KEY_NET = require("util/net_map")
 
 local RegisterEventListeners = function(inst)
   local cs = inst and inst.components or nil
@@ -117,7 +116,9 @@ AddPrefabPostInitAny(function(inst)
     or not inst:IsValid()
   then return inst end
 
-  inst[KEY_NET] = NetMap(inst, modname .. "_show-info_net-change-")
+  if not inst[KEY_NET] then
+    inst[KEY_NET] = NetMap(inst)
+  end
   inst[KEY_NET]:AddByMap({
     health = net_float,
     damage = net_string,

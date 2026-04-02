@@ -1,12 +1,13 @@
-local NetMap = Class(function(self, inst, event_prefix)
+local KEY_NET = GLOBAL.modname .. "_net-map"
+
+local NetMap = Class(function(self, inst)
   self.inst = inst
   self.map = {}
-  self.event_prefix = event_prefix or (modname .. "_net-change-")
 end)
 
 function NetMap:Add(key, netvar)
   netvar = netvar or net_string
-  self.map[key] = netvar(self.inst.GUID, self.event_prefix .. key)
+  self.map[key] = netvar(self.inst.GUID, KEY_NET .. ".change-" .. key)
 end
 
 function NetMap:AddByMap(map)
@@ -33,7 +34,7 @@ function NetMap:Get(key)
 end
 
 function NetMap:ListenForEvent(key, callback)
-  self.inst:ListenForEvent(self.event_prefix .. key, callback)
+  self.inst:ListenForEvent(KEY_NET .. ".change-" .. key, callback)
 end
 
-return NetMap
+return NetMap, KEY_NET
